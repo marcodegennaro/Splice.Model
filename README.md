@@ -1,2 +1,6 @@
-# A-Complex-formation-Model
-Develop a Coarse Grained model for the formation of spliceosome's A-Complex under the influence of antitumoral drugs.
+# A-Complex-formation-Model: Modeling Branch
+Develop several tools to:
+- Store the models and edit them
+- Generate and filter randomly or with assumption synthetic parameters
+- Simulation core
+- Visualizate the results
