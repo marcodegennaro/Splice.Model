@@ -206,7 +206,7 @@ def run_model(
     list of dicts  { 'model', 'mods_applied', 'params', 'results' }
         where 'results' is [ { 'drug', 'P1', 'P2', 'P3', ... }, ... ]
     """
-    parameters_sets = param.generate_parameter_sets(epochs, k_2_multiplic_cost= k_2_COST)
+    parameters_sets = param.generate_parameter_sets(epochs, k_2_multiplic_cost = k_2_COST)
     mods_applied = {pname: fname for pname, (fname, _) in mods.items()}
     all_results = []
 
@@ -244,14 +244,14 @@ class Simulation:
         drug_params: dict,
         k_2_COST: float,
         nodes_num: int,
-        assumption: bool,
+        assumption: bool = True,
     ):
         self.drug_conc   = drug_conc
         self.epochs      = epochs
         self.drug_params = drug_params
         self.k_2_COST    = k_2_COST
         self.nodes_num   = nodes_num
-        self.assumption = True
+        self.assumption = assumption
 
     # ------------------------------------------------------------------ #
     # Metodi: stessa logica di prima, ma senza ripetere i parametri        #
@@ -362,12 +362,13 @@ class Simulation:
         output: dict[str, list[dict]] = {name: [] for name in target_models}
 
         for val in param_values:
-            overrides = {param_name: val, **overrides_extra}
+            overrides_dic = {param_name: val, **overrides_extra}
 
-            parameters_sets = param.generate_parameter_sets_override(
-                self.epochs,
+            parameters_sets = param.generate_parameter_sets(
+                n_sets =  self.epochs,
                 k_2_multiplic_cost=self.k_2_COST,
-                overrides=overrides,
+                overrides = overrides_dic,
+                assumption  = self.assumption
             )
 
             for name, info in target_models.items():
@@ -382,7 +383,7 @@ class Simulation:
                     output[name].append({
                         "model":        name,
                         "mods_applied": mods_applied,
-                        "params":       ps,          # ps già contiene param_name=val
+                        "params":       ps,          
                         "results":      drug_results,
                     })
 
@@ -391,110 +392,9 @@ class Simulation:
 
 
 
-
-
-
-
 # =============================================================================
-# METHODS TO CHANGE ------ ALREADY CONTAINED IN CLASS ------ (down)
+# Filtering models by Expected trends
 # =============================================================================
-
-def run_single_model(
-    model_name: str,
-    drug_conc: list[float],
-    epochs: int,
-    drug_params: dict,
-    k_2_COST: float,
-    nodes_num: int
-) -> list[dict]:
-    """
-    Run one named model from ALL_MODELS.
-
-    Parameters
-    ----------
-    model_name  : key in ALL_MODELS, e.g. 'k_1[linear_increase]'
-    drug_conc   : concentration grid
-    epochs      : number of parameter sets
-    drug_params : {'K_hill', 'Vmax'} — constants for drug functions
-
-    Raises
-    ------
-    KeyError if model_name is not in ALL_MODELS.
-    """
-    if model_name not in db.ALL_MODELS:
-        raise KeyError(
-            f"Model '{model_name}' not found in catalogue.\n"
-            f"Available names:\n" + "\n".join(f"  {k}" for k in db.ALL_MODELS)
-        )
-    info = db.ALL_MODELS[model_name]
-    return run_model(drug_conc, 
-                     epochs, 
-                     info["mods"],
-                    drug_params,
-                    model_name=model_name,
-                    k_2_COST=k_2_COST, 
-                    nodes_number=  nodes_num)
-
-
-def run_all_models(
-    drug_conc: list[float],
-    epochs: int,
-    drug_params: dict,
-    k_2_COST: float,
-    nodes_num: int,
-) -> dict[str, list[dict]]:
-    """
-    Run all 11 models sequentially.
-
-    Parameters
-    ----------
-    drug_conc   : concentration grid
-    epochs      : number of parameter sets per model
-    drug_params : kinetic constants for drug modulation functions
-
-    Returns
-    -------
-    { model_name: run_model(...) output }
-    """
-    return {
-        name: run_model(drug_conc, epochs, info["mods"], drug_params, model_name=name, k_2_COST = k_2_COST, nodes_number= nodes_num)
-        for name, info in db.ALL_MODELS.items()
-    }
-
-
-def run_subset_models(
-    model_names: list[str],
-    drug_conc: list[float],
-    epochs: int,
-    drug_params: dict,
-    k_2_COST: float,
-    nodes_num: int
-    
-) -> dict[str, list[dict]]:
-    """
-    Run a user-specified subset of models by name.
-
-    Parameters
-    ----------
-    model_names : list of keys from ALL_MODELS
-    drug_conc, epochs, drug_params : as in run_all_models
-    """
-    return {
-        name: run_single_model(name, drug_conc, epochs, drug_params, k_2_COST = k_2_COST, nodes_num = nodes_num)
-        for name in model_names
-    }
- 
-
-
-# =============================================================================
-# METHODS TO CHANGE ------ ALREADY CONTAINED IN CLASS ------ (up)
-# =============================================================================
-
-
-
-
-
-
 
 
 
