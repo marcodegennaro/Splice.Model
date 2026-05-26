@@ -1,4 +1,4 @@
-Spliceosome Competition Modeling
+$Spliceosome Competition Modeling$
 
 This project focuses on modeling the assembly kinetics of the spliceosome in the presence of SF3B1 modulators (PladB and H3B). The main goal is to understand how Branch Point (BP) sequence features and the presence of "decoy" sites influence binding selectivity under pharmacological stress.
 
